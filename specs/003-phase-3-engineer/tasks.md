@@ -47,9 +47,9 @@
 
 ## Phase 3.1: Setup
 
-- [ ] **T001** Create Engineer Agent directory structure in `src-tauri/src/agents/`, `src-tauri/src/models/`, `src-tauri/src/codegen/`, `src-tauri/src/concurrent/`, `src/components/engineer/`
-- [ ] **T002** Add Rust dependencies to `src-tauri/Cargo.toml`: tokio (async runtime), serde (serialization), anyhow (error handling), tempfile (atomic writes)
-- [ ] **T003** [P] Configure ESLint and Prettier for TypeScript code quality validation
+- [x] **T001** Create Engineer Agent directory structure in `src-tauri/src/agents/`, `src-tauri/src/models/`, `src-tauri/src/codegen/`, `src-tauri/src/concurrent/`, `src/components/engineer/`
+- [x] **T002** Add Rust dependencies to `src-tauri/Cargo.toml`: tokio (async runtime), serde (serialization), anyhow (error handling), tempfile (atomic writes)
+- [x] **T003** [P] Configure ESLint and Prettier for TypeScript code quality validation
 
 ---
 
@@ -57,43 +57,43 @@
 **CRITICAL: These tests MUST be written and MUST FAIL before ANY implementation**
 
 ### Contract Tests (IPC Commands)
-- [ ] **T004** [P] Contract test for `start_code_generation` command in `src-tauri/tests/contract/engineer_commands_test.rs` - verify command accepts ArchitecturePlan and returns Result
-- [ ] **T005** [P] Contract test for `get_engineer_state` command in `src-tauri/tests/contract/engineer_commands_test.rs` - verify returns EngineerState enum
-- [ ] **T006** [P] Contract test for `get_generation_progress` command in `src-tauri/tests/contract/engineer_commands_test.rs` - verify returns GenerationProgress struct
-- [ ] **T007** [P] Contract test for `cancel_generation` command in `src-tauri/tests/contract/engineer_commands_test.rs` - verify cancels and preserves completed files
-- [ ] **T008** [P] Contract test for `retry_generation` command in `src-tauri/tests/contract/engineer_commands_test.rs` - verify retries from ERROR state
-- [ ] **T009** [P] Contract test for `get_quality_report` command in `src-tauri/tests/contract/engineer_commands_test.rs` - verify returns QualityReport
-- [ ] **T010** [P] Contract test for `export_generated_code` command in `src-tauri/tests/contract/engineer_commands_test.rs` - verify exports to directory
-- [ ] **T011** [P] Contract test for `handle_timeout_prompt` command in `src-tauri/tests/contract/engineer_commands_test.rs` - verify handles timeout choices
+- [x] **T004** [P] Contract test for `start_code_generation` command in `src-tauri/tests/contract/engineer_commands_test.rs` - verify command accepts ArchitecturePlan and returns Result
+- [x] **T005** [P] Contract test for `get_engineer_state` command in `src-tauri/tests/contract/engineer_commands_test.rs` - verify returns EngineerState enum
+- [x] **T006** [P] Contract test for `get_generation_progress` command in `src-tauri/tests/contract/engineer_commands_test.rs` - verify returns GenerationProgress struct
+- [x] **T007** [P] Contract test for `cancel_generation` command in `src-tauri/tests/contract/engineer_commands_test.rs` - verify cancels and preserves completed files
+- [x] **T008** [P] Contract test for `retry_generation` command in `src-tauri/tests/contract/engineer_commands_test.rs` - verify retries from ERROR state
+- [x] **T009** [P] Contract test for `get_quality_report` command in `src-tauri/tests/contract/engineer_commands_test.rs` - verify returns QualityReport
+- [x] **T010** [P] Contract test for `export_generated_code` command in `src-tauri/tests/contract/engineer_commands_test.rs` - verify exports to directory
+- [x] **T011** [P] Contract test for `handle_timeout_prompt` command in `src-tauri/tests/contract/engineer_commands_test.rs` - verify handles timeout choices
 
 ### Contract Tests (IPC Events)
-- [ ] **T012** [P] Contract test for `engineer:state_changed` event in `src-tauri/tests/contract/engineer_events_test.rs` - verify emits on state transitions
-- [ ] **T013** [P] Contract test for `engineer:file_started` event in `src-tauri/tests/contract/engineer_events_test.rs` - verify emits when file generation starts
-- [ ] **T014** [P] Contract test for `engineer:file_completed` event in `src-tauri/tests/contract/engineer_events_test.rs` - verify emits when file completes
-- [ ] **T015** [P] Contract test for `engineer:reasoning` event in `src-tauri/tests/contract/engineer_events_test.rs` - verify streams reasoning entries
-- [ ] **T016** [P] Contract test for `engineer:progress` event in `src-tauri/tests/contract/engineer_events_test.rs` - verify updates progress
-- [ ] **T017** [P] Contract test for `engineer:error` event in `src-tauri/tests/contract/engineer_events_test.rs` - verify emits on errors
-- [ ] **T018** [P] Contract test for `engineer:timeout_prompt` event in `src-tauri/tests/contract/engineer_events_test.rs` - verify prompts on timeout
+- [x] **T012** [P] Contract test for `engineer:state_changed` event in `src-tauri/tests/contract/engineer_events_test.rs` - verify emits on state transitions
+- [x] **T013** [P] Contract test for `engineer:file_started` event in `src-tauri/tests/contract/engineer_events_test.rs` - verify emits when file generation starts
+- [x] **T014** [P] Contract test for `engineer:file_completed` event in `src-tauri/tests/contract/engineer_events_test.rs` - verify emits when file completes
+- [x] **T015** [P] Contract test for `engineer:reasoning` event in `src-tauri/tests/contract/engineer_events_test.rs` - verify streams reasoning entries
+- [x] **T016** [P] Contract test for `engineer:progress` event in `src-tauri/tests/contract/engineer_events_test.rs` - verify updates progress
+- [x] **T017** [P] Contract test for `engineer:error` event in `src-tauri/tests/contract/engineer_events_test.rs` - verify emits on errors
+- [x] **T018** [P] Contract test for `engineer:timeout_prompt` event in `src-tauri/tests/contract/engineer_events_test.rs` - verify prompts on timeout
 
 ### Integration Tests
-- [ ] **T019** [P] Integration test for full generation flow in `src-tauri/tests/integration/full_generation_flow_test.rs` - IDLE → ANALYZING_PLAN → GENERATING_CODE → REVIEWING → COMPLETE
-- [ ] **T020** [P] Integration test for self-review cycle in `src-tauri/tests/integration/self_review_cycle_test.rs` - detect issues, auto-fix, re-validate
-- [ ] **T021** [P] Integration test for error recovery in `src-tauri/tests/integration/error_recovery_test.rs` - ERROR state → retry with modified plan
+- [x] **T019** [P] Integration test for full generation flow in `src-tauri/tests/integration/full_generation_flow_test.rs` - IDLE → ANALYZING_PLAN → GENERATING_CODE → REVIEWING → COMPLETE
+- [x] **T020** [P] Integration test for self-review cycle in `src-tauri/tests/integration/self_review_cycle_test.rs` - detect issues, auto-fix, re-validate
+- [x] **T021** [P] Integration test for error recovery in `src-tauri/tests/integration/error_recovery_test.rs` - ERROR state → retry with modified plan
 
 ---
 
 ## Phase 3.3: Core Implementation (ONLY after tests are failing)
 
 ### Models (Data Structures)
-- [ ] **T022** [P] Create `EngineerState` enum in `src-tauri/src/models/engineer_state.rs` with 6 states (Idle, AnalyzingPlan, GeneratingCode, Reviewing, Complete, Error)
-- [ ] **T023** [P] Create `ArchitecturePlan` struct in `src-tauri/src/models/architecture_plan.rs` (reuse from Architect Agent if exists, otherwise create)
-- [ ] **T024** [P] Create `FileTemplate` struct in `src-tauri/src/models/file_template.rs` with path, purpose, estimated_lines, language, dependencies
-- [ ] **T025** [P] Create `GeneratedFile` struct in `src-tauri/src/models/generated_file.rs` with path, content, language, lines, imports, exports, types, confidence
-- [ ] **T026** [P] Create `CodeQualityCheck` struct in `src-tauri/src/models/quality_check.rs` with validation results and issues list
-- [ ] **T027** [P] Create `QualityIssue` struct in `src-tauri/src/models/quality_check.rs` with severity, category, line, description, suggestion
-- [ ] **T028** [P] Create `ConfidenceBreakdown` struct in `src-tauri/src/models/confidence.rs` with overall, quality_score, plan_adherence, issue_penalty
-- [ ] **T029** [P] Create `ReasoningEntry` struct in `src-tauri/src/models/reasoning.rs` (reuse from Architect Agent if exists)
-- [ ] **T030** [P] Create `CodeOutput` struct in `src-tauri/src/models/code_output.rs` with files, total_lines, confidence, quality_report, metadata
+- [x] **T022** [P] Create `EngineerState` enum in `src-tauri/src/models/engineer_state.rs` with 6 states (Idle, AnalyzingPlan, GeneratingCode, Reviewing, Complete, Error)
+- [x] **T023** [P] Create `ArchitecturePlan` struct in `src-tauri/src/models/architecture_plan.rs` (reuse from Architect Agent if exists, otherwise create)
+- [x] **T024** [P] Create `FileTemplate` struct in `src-tauri/src/models/file_template.rs` with path, purpose, estimated_lines, language, dependencies
+- [x] **T025** [P] Create `GeneratedFile` struct in `src-tauri/src/models/generated_file.rs` with path, content, language, lines, imports, exports, types, confidence
+- [x] **T026** [P] Create `CodeQualityCheck` struct in `src-tauri/src/models/quality_check.rs` with validation results and issues list
+- [x] **T027** [P] Create `QualityIssue` struct in `src-tauri/src/models/quality_check.rs` with severity, category, line, description, suggestion
+- [x] **T028** [P] Create `ConfidenceBreakdown` struct in `src-tauri/src/models/engineer_confidence.rs` with overall, quality_score, plan_adherence, issue_penalty
+- [x] **T029** [P] Create `ReasoningEntry` struct in `src-tauri/src/models/reasoning.rs` (reuse from Architect Agent if exists)
+- [x] **T030** [P] Create `CodeOutput` struct in `src-tauri/src/models/code_output.rs` with files, total_lines, confidence, quality_report, metadata
 
 ### Code Generation Core
 - [ ] **T031** Implement `PlanAnalyzer` in `src-tauri/src/agents/plan_analysis.rs` - parse ArchitecturePlan, validate completeness, build dependency graph
