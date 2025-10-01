@@ -16,6 +16,14 @@ pub struct CodeOutput {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct QualityReport {
+    pub files_reviewed: usize,
+    pub total_lines: usize,
+    pub issues: Vec<QualityIssue>,
+    pub fixes_applied: Vec<super::quality_check::AppliedFix>,
+    pub confidence: super::quality_check::QualityConfidenceBreakdown,
+    #[serde(skip)]
+    pub duration: std::time::Duration,
+    // Legacy fields for compatibility
     pub total_files: usize,
     pub files_passed: usize,
     pub files_failed: usize,
@@ -98,6 +106,20 @@ impl CodeOutput {
 impl QualityReport {
     pub fn new(total_files: usize) -> Self {
         Self {
+            files_reviewed: total_files,
+            total_lines: 0,
+            issues: Vec::new(),
+            fixes_applied: Vec::new(),
+            confidence: super::quality_check::QualityConfidenceBreakdown {
+                overall: 100.0,
+                code_quality: 100.0,
+                type_safety: 100.0,
+                security: 100.0,
+                performance: 100.0,
+                maintainability: 100.0,
+            },
+            duration: std::time::Duration::from_secs(0),
+            // Legacy fields
             total_files,
             files_passed: 0,
             files_failed: 0,

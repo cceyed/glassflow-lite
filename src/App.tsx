@@ -1,7 +1,12 @@
-import { ArchitectTest } from "./agents/architect/components/ArchitectTest";
+import { RevampedPipelineUI } from "./components/RevampedPipelineUI";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 function App() {
-  return <ArchitectTest />;
+  return (
+    <ErrorBoundary>
+      <RevampedPipelineUI />
+    </ErrorBoundary>
+  );
 }
 
 export default App;

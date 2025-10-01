@@ -164,3 +164,23 @@ impl Severity {
         }
     }
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AppliedFix {
+    pub issue_id: String,
+    pub file: String,
+    pub description: String,
+    pub before: String,
+    pub after: String,
+    pub confidence: f32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct QualityConfidenceBreakdown {
+    pub overall: f32,
+    pub code_quality: f32,
+    pub type_safety: f32,
+    pub security: f32,
+    pub performance: f32,
+    pub maintainability: f32,
+}

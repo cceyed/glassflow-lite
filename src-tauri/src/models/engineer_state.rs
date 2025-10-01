@@ -1,7 +1,7 @@
 // T022: EngineerState enum with 6 states
 use serde::{Deserialize, Serialize};
 use std::time::Instant;
-use super::architecture_plan::ArchitecturePlan as EngineerArchitecturePlan;
+use super::plan::ArchitecturePlan as EngineerArchitecturePlan;
 use super::generated_file::GeneratedFile;
 use super::code_output::CodeOutput;
 

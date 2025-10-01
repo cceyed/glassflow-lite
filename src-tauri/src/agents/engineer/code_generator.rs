@@ -90,7 +90,7 @@ Code:"#,
             project_name = plan.project_name,
             tech_stack = format!("{} with {}", 
                 plan.tech_stack.language,
-                plan.tech_stack.framework.as_deref().unwrap_or("no framework")
+                &plan.tech_stack.framework
             ),
             pattern = plan.architecture_pattern,
             dependencies = template.dependencies.join(", "),

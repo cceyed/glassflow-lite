@@ -16,11 +16,11 @@ impl TemplateEngine {
         // Architecture Context
         prompt.push_str("## Architecture Context\n\n");
         prompt.push_str(&format!("- **Project**: {}\n", plan.project_name));
-        prompt.push_str(&format!("- **Type**: {:?}\n", plan.project_intent));
+        prompt.push_str(&format!("- **Type**: {:?}\n", plan.project_type));
         prompt.push_str(&format!("- **Language**: {}\n", plan.tech_stack.language));
         
-        if let Some(framework) = &plan.tech_stack.framework {
-            prompt.push_str(&format!("- **Framework**: {}\n", framework));
+        if !plan.tech_stack.framework.is_empty() {
+            prompt.push_str(&format!("- **Framework**: {}\n", plan.tech_stack.framework));
         }
         
         prompt.push_str(&format!("- **Pattern**: {:?}\n\n", plan.architecture_pattern));

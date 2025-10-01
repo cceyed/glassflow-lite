@@ -77,6 +77,12 @@ fn parse_architecture_plan(
     // Calculate confidence based on completeness
     let confidence = calculate_plan_confidence(&components, &decisions, analysis);
 
+    // Generate file structure from components
+    let file_structure = generate_file_structure(&components, &tech_stack);
+    
+    // Generate dependencies based on tech stack
+    let dependencies = generate_dependencies(&tech_stack);
+
     Ok(ArchitecturePlan {
         project_name,
         project_type,
@@ -85,6 +91,8 @@ fn parse_architecture_plan(
         components,
         decisions,
         confidence,
+        file_structure,
+        dependencies,
     })
 }
 
@@ -275,4 +283,86 @@ fn extract_json_from_response(response: &str) -> Result<String, String> {
     }
     
     Err("No JSON found in LLM response".to_string())
+}
+
+fn generate_file_structure(components: &[Component], tech_stack: &TechStack) -> crate::models::plan::FileStructure {
+    use crate::models::{FileTemplate, Language, plan::{Directory, FileStructure}};
+    
+    // Determine language
+    let language = match tech_stack.language.as_str() {
+        "TypeScript" => Language::TypeScript,
+        "JavaScript" => Language::JavaScript,
+        "Python" => Language::Python,
+        "Rust" => Language::Rust,
+        _ => Language::TypeScript,
+    };
+    
+    // Create directories
+    let directories = vec![
+        Directory {
+            path: "src".to_string(),
+            purpose: "Source code".to_string(),
+        },
+        Directory {
+            path: "src/components".to_string(),
+            purpose: "React components".to_string(),
+        },
+    ];
+    
+    // Create file templates from components
+    let files: Vec<FileTemplate> = components.iter().map(|c| {
+        FileTemplate {
+            path: c.file_path.clone(),
+            purpose: c.purpose.clone(),
+            language: language.clone(),
+            dependencies: vec![],
+            generation_hints: Some(vec![format!("Export: {}", c.name)]),
+            estimated_lines: 50,
+        }
+    }).collect();
+    
+    FileStructure {
+        directories,
+        files,
+    }
+}
+
+fn generate_dependencies(tech_stack: &TechStack) -> Vec<crate::models::plan::Dependency> {
+    use crate::models::plan::Dependency;
+    
+    let mut deps = Vec::new();
+    
+    // Add framework dependency
+    if !tech_stack.framework.is_empty() {
+        deps.push(Dependency {
+            name: tech_stack.framework.to_lowercase(),
+            version: "latest".to_string(),
+            dev_only: false,
+        });
+    }
+    
+    // Add common dependencies based on framework
+    if tech_stack.framework.to_lowercase().contains("react") {
+        deps.push(Dependency {
+            name: "react".to_string(),
+            version: "^18.0.0".to_string(),
+            dev_only: false,
+        });
+        deps.push(Dependency {
+            name: "react-dom".to_string(),
+            version: "^18.0.0".to_string(),
+            dev_only: false,
+        });
+    }
+    
+    // Add TypeScript if needed
+    if tech_stack.language == "TypeScript" {
+        deps.push(Dependency {
+            name: "typescript".to_string(),
+            version: "^5.0.0".to_string(),
+            dev_only: true,
+        });
+    }
+    
+    deps
 }

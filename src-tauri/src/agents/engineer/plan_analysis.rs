@@ -18,8 +18,8 @@ impl PlanAnalyzer {
         Self { plan }
     }
 
-    pub fn validate(&self) -> Result<(), String> {
-        self.plan.validate()?;
+    pub fn validate(&self) -> anyhow::Result<()> {
+        self.plan.validate().map_err(|e| anyhow::anyhow!(e))?;
         
         // Check for circular dependencies
         let graph = self.build_dependency_graph()?;
@@ -28,7 +28,7 @@ impl PlanAnalyzer {
         Ok(())
     }
 
-    pub fn build_dependency_graph(&self) -> Result<DependencyGraph, String> {
+    pub fn build_dependency_graph(&self) -> anyhow::Result<DependencyGraph> {
         let mut nodes = Vec::new();
         let mut edges: HashMap<String, Vec<String>> = HashMap::new();
         
@@ -64,7 +64,7 @@ impl PlanAnalyzer {
         &self,
         nodes: &[String],
         edges: &HashMap<String, Vec<String>>,
-    ) -> Result<Vec<Vec<String>>, String> {
+    ) -> anyhow::Result<Vec<Vec<String>>> {
         let mut in_degree: HashMap<String, usize> = HashMap::new();
         let mut levels = Vec::new();
         
@@ -91,7 +91,7 @@ impl PlanAnalyzer {
                 .collect();
             
             if current_level.is_empty() {
-                return Err("Circular dependency detected".to_string());
+                return Err(anyhow::anyhow!("Circular dependency detected"));
             }
             
             // Remove processed nodes and update in-degrees
@@ -113,13 +113,13 @@ impl PlanAnalyzer {
         Ok(levels)
     }
 
-    fn detect_circular_dependencies(&self, graph: &DependencyGraph) -> Result<(), String> {
+    fn detect_circular_dependencies(&self, graph: &DependencyGraph) -> anyhow::Result<()> {
         // If topological sort succeeded, no circular dependencies exist
         // This is a double-check
         for (node, deps) in &graph.edges {
             for dep in deps {
                 if self.has_path_to(graph, dep, node) {
-                    return Err(format!("Circular dependency: {} ↔ {}", node, dep));
+                    return Err(anyhow::anyhow!("Circular dependency: {} ↔ {}", node, dep));
                 }
             }
         }
@@ -174,7 +174,7 @@ impl PlanAnalyzer {
             .collect()
     }
 
-    pub fn get_generation_order(&self) -> Result<Vec<Vec<&FileTemplate>>, String> {
+    pub fn get_generation_order(&self) -> anyhow::Result<Vec<Vec<&FileTemplate>>> {
         let graph = self.build_dependency_graph()?;
         
         let mut ordered = Vec::new();

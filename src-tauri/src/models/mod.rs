@@ -39,6 +39,7 @@ pub mod generated_file;
 pub mod quality_check;
 pub mod engineer_confidence;
 pub mod code_output;
+pub mod debug;
 
 // Architect Agent exports
 pub use state::AgentState;
@@ -46,15 +47,22 @@ pub use analysis::{SpecificationAnalysis, ProjectIntent};
 pub use requirement::{Requirement, RequirementCategory, Priority, Source};
 pub use ambiguity::{Ambiguity, Impact};
 pub use question::{Question, QuestionType, QuestionOption};
-pub use plan::{ArchitecturePlan, ArchitecturePattern, TechStack, Component, ArchitectureDecision};
+pub use plan::{ArchitecturePlan, ArchitecturePattern, TechStack, Component, ArchitectureDecision, Dependency, FileStructure, Directory};
 pub use confidence::ConfidenceBreakdown;
 pub use reasoning::{ReasoningEntry, ArchitectPhase, ReasoningType};
 
 // Engineer Agent exports
 pub use engineer_state::EngineerState;
-pub use architecture_plan::ArchitecturePlan as EngineerArchitecturePlan;
+// Use the same ArchitecturePlan from Architect (plan module)
+pub use plan::ArchitecturePlan as EngineerArchitecturePlan;
 pub use file_template::{FileTemplate, Language};
 pub use generated_file::{GeneratedFile, Import, Export, ExportType, TypeDefinition, TypeKind};
-pub use quality_check::{CodeQualityCheck, QualityIssue, Severity, CheckCategory, CodeContext};
+pub use quality_check::{CodeQualityCheck, QualityIssue, Severity, CheckCategory, CodeContext, AppliedFix, QualityConfidenceBreakdown};
 pub use engineer_confidence::ConfidenceBreakdown as EngineerConfidenceBreakdown;
 pub use code_output::{CodeOutput, QualityReport, GenerationMetadata};
+
+// Debug Agent exports
+pub use debug::{
+    DebugReport, Bug, BugSeverity, BugCategory, DebugAppliedFix, 
+    DebugConfidenceBreakdown, TestResult
+};

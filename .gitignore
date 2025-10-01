@@ -25,3 +25,13 @@ dist-ssr
 
 # Tauri
 src-tauri/target
+
+# Environment variables (contains API keys - NEVER commit!)
+.env
+.env.local
+.env.*.local
+
+# Environment variables (contains API keys)
+.env
+.env.local
+.env.*.local

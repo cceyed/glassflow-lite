@@ -9,6 +9,9 @@ mod llm;
 mod models;
 mod ipc;
 mod persistence;
+mod codegen;
+mod concurrent;
+mod orchestrator;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct AgentTask {
@@ -56,13 +59,41 @@ fn get_available_agents() -> Vec<String> {
 }
 
 fn main() {
+    // Load environment variables from .env file
+    dotenvy::dotenv().ok();
+    
+    // Validate API key is set
+    if std::env::var("OPENROUTER_API_KEY").is_err() {
+        eprintln!("⚠️  WARNING: OPENROUTER_API_KEY not set!");
+        eprintln!("Please create a .env file with your OpenRouter API key.");
+        eprintln!("See .env.example for the format.");
+    }
+    
     // Initialize Architect state
     let architect_state = ipc::ArchitectState::new()
         .expect("Failed to initialize Architect state");
     
+    // Initialize Engineer state
+    let engineer_state = ipc::EngineerAgentState {
+        agent: std::sync::Arc::new(std::sync::Mutex::new(None)),
+    };
+    
+    // Initialize Quality state
+    let quality_state = ipc::QualityAgentState::new();
+    
+    // Initialize Debug state
+    let debug_state = ipc::DebugAgentState::new();
+    
+    // Initialize Orchestrator state
+    let orchestrator_state = ipc::OrchestratorState::new();
+    
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .manage(architect_state)
+        .manage(engineer_state)
+        .manage(quality_state)
+        .manage(debug_state)
+        .manage(orchestrator_state)
         .invoke_handler(tauri::generate_handler![
             process_agent_task,
             get_available_agents,
@@ -72,6 +103,25 @@ fn main() {
             ipc::architect_answer,
             ipc::architect_export_plan,
             ipc::architect_retry,
+            ipc::start_code_generation,
+            ipc::get_engineer_state,
+            ipc::get_generation_progress,
+            ipc::cancel_generation,
+            ipc::retry_generation,
+            ipc::get_quality_report,
+            ipc::export_generated_code,
+            ipc::handle_timeout_prompt,
+            ipc::quality_review_code,
+            ipc::quality_review_code_with_config,
+            ipc::quality_get_last_report,
+            ipc::quality_reset,
+            ipc::debug_test_code,
+            ipc::debug_test_with_config,
+            ipc::debug_get_last_report,
+            ipc::debug_reset,
+            ipc::orchestrator_run_pipeline,
+            ipc::orchestrator_get_status,
+            ipc::orchestrator_reset,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

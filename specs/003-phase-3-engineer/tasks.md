@@ -96,27 +96,27 @@
 - [x] **T030** [P] Create `CodeOutput` struct in `src-tauri/src/models/code_output.rs` with files, total_lines, confidence, quality_report, metadata
 
 ### Code Generation Core
-- [ ] **T031** Implement `PlanAnalyzer` in `src-tauri/src/agents/plan_analysis.rs` - parse ArchitecturePlan, validate completeness, build dependency graph
-- [ ] **T032** Implement `CodeGenerator` in `src-tauri/src/agents/code_generator.rs` - generate code from FileTemplate using LLM with streaming
-- [ ] **T033** Implement `TemplateEngine` in `src-tauri/src/codegen/template_engine.rs` - build generation prompts with architecture context
-- [ ] **T034** Implement `ImportResolver` in `src-tauri/src/codegen/import_resolver.rs` - validate imports against architecture plan dependencies
-- [ ] **T035** Implement `TypeChecker` in `src-tauri/src/codegen/type_checker.rs` - validate TypeScript types using TypeScript Compiler API (via Command)
-- [ ] **T036** Implement `SyntaxValidator` in `src-tauri/src/codegen/syntax_validator.rs` - validate syntax using TypeScript Compiler API (via Command)
+- [x] **T031** Implement `PlanAnalyzer` in `src-tauri/src/agents/engineer/plan_analysis.rs` - parse ArchitecturePlan, validate completeness, build dependency graph
+- [x] **T032** Implement `CodeGenerator` in `src-tauri/src/agents/engineer/code_generator.rs` - generate code from FileTemplate using LLM with streaming
+- [x] **T033** Implement `TemplateEngine` in `src-tauri/src/codegen/template_engine.rs` - build generation prompts with architecture context
+- [x] **T034** Implement `ImportResolver` in `src-tauri/src/codegen/import_resolver.rs` - validate imports against architecture plan dependencies
+- [x] **T035** Implement `TypeChecker` in `src-tauri/src/codegen/type_checker.rs` - validate TypeScript types using TypeScript Compiler API (via Command)
+- [x] **T036** Implement `SyntaxValidator` in `src-tauri/src/codegen/syntax_validator.rs` - validate syntax using TypeScript Compiler API (via Command)
 
 ### Quality Checking
-- [ ] **T037** Implement `QualityChecker` in `src-tauri/src/agents/quality_checker.rs` - run all quality checks (syntax, types, imports, exports, style, edge cases, docs)
-- [ ] **T038** Implement style validation in `src-tauri/src/agents/quality_checker.rs` - run ESLint via Command and parse JSON output
-- [ ] **T039** Implement `AutoFixer` in `src-tauri/src/agents/auto_fixer.rs` - auto-fix Low/Medium severity issues (formatting, style violations)
+- [x] **T037** Implement `QualityChecker` in `src-tauri/src/agents/engineer/quality_checker.rs` - run all quality checks (syntax, types, imports, exports, style, edge cases, docs)
+- [x] **T038** Implement style validation in `src-tauri/src/agents/engineer/quality_checker.rs` - run ESLint via Command and parse JSON output
+- [x] **T039** Implement `AutoFixer` in `src-tauri/src/agents/engineer/auto_fixer.rs` - auto-fix Low/Medium severity issues (formatting, style violations)
 
 ### Confidence Calculation
-- [ ] **T040** Implement confidence calculation in `src-tauri/src/agents/confidence.rs` - calculate overall confidence as weighted average (quality 50%, adherence 30%, penalty 20%)
-- [ ] **T041** Implement quality score calculation in `src-tauri/src/agents/confidence.rs` - based on passed checks (syntax, types, imports, exports, style, edge cases, docs)
-- [ ] **T042** Implement plan adherence calculation in `src-tauri/src/agents/confidence.rs` - compare generated output to architecture plan specifications
-- [ ] **T043** Implement issue penalty calculation in `src-tauri/src/agents/confidence.rs` - apply penalties by severity (Critical 20%, High 10%, Medium 5%, Low 2%), cap at 80%
+- [x] **T040** Implement confidence calculation in `src-tauri/src/agents/engineer/confidence.rs` - calculate overall confidence as weighted average (quality 50%, adherence 30%, penalty 20%)
+- [x] **T041** Implement quality score calculation in `src-tauri/src/agents/engineer/confidence.rs` - based on passed checks (syntax, types, imports, exports, style, edge cases, docs)
+- [x] **T042** Implement plan adherence calculation in `src-tauri/src/agents/engineer/confidence.rs` - compare generated output to architecture plan specifications
+- [x] **T043** Implement issue penalty calculation in `src-tauri/src/agents/engineer/confidence.rs` - apply penalties by severity (Critical 20%, High 10%, Medium 5%, Low 2%), cap at 80%
 
 ### Concurrent Generation
-- [ ] **T044** Implement `FileScheduler` in `src-tauri/src/concurrent/file_scheduler.rs` - determine generation order based on dependencies (dependency-first, sequential, or parallel)
-- [ ] **T045** Implement `ParallelGenerator` in `src-tauri/src/concurrent/parallel_gen.rs` - use Tokio async runtime with semaphore (max 3-5 concurrent) to generate independent files in parallel
+- [x] **T044** Implement `FileScheduler` in `src-tauri/src/concurrent/file_scheduler.rs` - determine generation order based on dependencies (dependency-first, sequential, or parallel)
+- [x] **T045** Implement `ParallelGenerator` in `src-tauri/src/concurrent/parallel_gen.rs` - use Tokio async runtime with semaphore (max 3-5 concurrent) to generate independent files in parallel
 
 ---
 

@@ -36,12 +36,22 @@ impl ArchitectState {
     }
 }
 
+#[derive(serde::Serialize)]
+pub struct ArchitectAnalysisResult {
+    pub status: String,
+    pub requirements_count: usize,
+    pub ambiguities_count: usize,
+    pub next_phase: String,
+    pub confidence: f32,
+    pub duration_ms: u128,
+}
+
 #[tauri::command]
 pub async fn architect_analyze(
     spec: String,
     state: tauri::State<'_, ArchitectState>,
     app: tauri::AppHandle,
-) -> Result<String, String> {
+) -> Result<ArchitectAnalysisResult, String> {
     if spec.is_empty() {
         return Err("Specification cannot be empty".to_string());
     }
@@ -52,6 +62,11 @@ pub async fn architect_analyze(
     {
         let mut current_state = state.state.lock().unwrap();
         let old_state = current_state.state_name();
+        
+        // If not in IDLE, reset to IDLE first (allows re-testing)
+        if !matches!(*current_state, AgentState::Idle) {
+            *current_state = AgentState::Idle;
+        }
         
         let new_state = AgentState::Analyzing {
             spec: spec.clone(),
@@ -70,28 +85,40 @@ pub async fn architect_analyze(
     
     match analysis_result {
         Ok(spec_analysis) => {
+            let requirements_count = spec_analysis.explicit_requirements.len();
+            let ambiguities_count = spec_analysis.ambiguities.len();
+            
             emit_reasoning(&app, "analysis_complete", &format!(
                 "Analysis complete: {} requirements, {} ambiguities",
-                spec_analysis.explicit_requirements.len(),
-                spec_analysis.ambiguities.len()
+                requirements_count,
+                ambiguities_count
             ));
             
             // Store analysis
             *state.analysis.lock().unwrap() = Some(spec_analysis.clone());
             
             // Decide next state based on ambiguities
-            if !spec_analysis.ambiguities.is_empty() && spec_analysis.ambiguities.len() > 2 {
+            let next_phase = if ambiguities_count > 2 {
                 // Transition to QUESTIONING
                 transition_to_questioning(&state, app.clone(), spec_analysis).await?;
+                "questioning"
             } else {
                 // Transition to DESIGNING (spec is clear enough)
                 transition_to_designing(&state, app.clone(), spec_analysis).await?;
-            }
+                "designing"
+            };
             
             // Persist state after successful transition
             let _ = state.persist_state();
             
-            Ok("Analysis complete".to_string())
+            Ok(ArchitectAnalysisResult {
+                status: "success".to_string(),
+                requirements_count,
+                ambiguities_count,
+                next_phase: next_phase.to_string(),
+                confidence: 85.0, // Placeholder
+                duration_ms: start_time.elapsed().as_millis(),
+            })
         }
         Err(e) => {
             // Transition to ERROR
@@ -268,10 +295,21 @@ fn emit_error(app: &tauri::AppHandle, message: &str, recoverable: bool) {
     }));
 }
 
+#[derive(serde::Serialize)]
+pub struct ArchitectStateResponse {
+    pub state_name: String,
+    pub analysis: Option<SpecificationAnalysis>,
+}
+
 #[tauri::command]
-pub fn architect_get_state(state: tauri::State<ArchitectState>) -> Result<String, String> {
+pub fn architect_get_state(state: tauri::State<ArchitectState>) -> Result<ArchitectStateResponse, String> {
     let current_state = state.state.lock().unwrap();
-    Ok(current_state.state_name().to_string())
+    let analysis = state.analysis.lock().unwrap().clone();
+    
+    Ok(ArchitectStateResponse {
+        state_name: current_state.state_name().to_string(),
+        analysis,
+    })
 }
 
 #[tauri::command]
@@ -374,7 +412,7 @@ pub async fn architect_retry(
     spec: String,
     state: tauri::State<'_, ArchitectState>,
     app: tauri::AppHandle,
-) -> Result<String, String> {
+) -> Result<ArchitectAnalysisResult, String> {
     {
         let mut current_state = state.state.lock().unwrap();
         

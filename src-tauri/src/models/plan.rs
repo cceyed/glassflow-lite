@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use super::{ConfidenceBreakdown, analysis::ProjectIntent};
+use super::{ConfidenceBreakdown, analysis::ProjectIntent, FileTemplate};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ArchitecturePattern {
@@ -37,6 +37,25 @@ pub struct ArchitectureDecision {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Dependency {
+    pub name: String,
+    pub version: String,
+    pub dev_only: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct FileStructure {
+    pub directories: Vec<Directory>,
+    pub files: Vec<FileTemplate>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Directory {
+    pub path: String,
+    pub purpose: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ArchitecturePlan {
     pub project_name: String,
     pub project_type: ProjectIntent,
@@ -45,6 +64,9 @@ pub struct ArchitecturePlan {
     pub components: Vec<Component>,
     pub decisions: Vec<ArchitectureDecision>,
     pub confidence: ConfidenceBreakdown,
+    // Additional fields for Engineer
+    pub file_structure: FileStructure,
+    pub dependencies: Vec<Dependency>,
 }
 
 impl Default for ArchitecturePlan {
@@ -62,6 +84,11 @@ impl Default for ArchitecturePlan {
             components: Vec::new(),
             decisions: Vec::new(),
             confidence: ConfidenceBreakdown::default(),
+            file_structure: FileStructure {
+                directories: Vec::new(),
+                files: Vec::new(),
+            },
+            dependencies: Vec::new(),
         }
     }
 }
