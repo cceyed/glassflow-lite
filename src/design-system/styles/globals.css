@@ -1,0 +1,65 @@
+/**
+ * Global Design System Styles
+ * Custom utilities for glass effects and design system
+ */
+
+@layer utilities {
+  /* Glass Effect - for surfaces with blur and transparency */
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Glass Blue Glow - for active/focused elements */
+  .glass-blue-glow {
+    box-shadow: 0 0 20px rgba(0, 102, 255, 0.3),
+                0 0 40px rgba(0, 102, 255, 0.2),
+                inset 0 0 20px rgba(0, 102, 255, 0.1);
+  }
+
+  /* White Glow - for hover states */
+  .white-glow {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3),
+                0 0 40px rgba(255, 255, 255, 0.2);
+  }
+
+  /* Text Shimmer - for animated text */
+  .text-shimmer {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.8) 0%,
+      rgba(255, 255, 255, 1) 50%,
+      rgba(255, 255, 255, 0.8) 100%
+    );
+    background-size: 200% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 3s linear infinite;
+  }
+
+  /* Border Shimmer - for animated borders */
+  .border-shimmer {
+    position: relative;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.3) 50%,
+      rgba(255, 255, 255, 0.1) 100%
+    );
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+  }
+
+  /* Glass Brand Effect - ONLY for logo and brand elements */
+  .glass-brand {
+    background: rgba(100, 150, 255, 0.08);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(100, 150, 255, 0.25);
+    box-shadow: 0 0 20px rgba(100, 150, 255, 0.4),
+                inset 0 0 20px rgba(100, 150, 255, 0.1);
+  }
+}

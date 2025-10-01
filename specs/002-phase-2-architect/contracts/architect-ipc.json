@@ -1,0 +1,291 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Architect Agent IPC Contracts",
+  "description": "Tauri IPC commands and events for Architect Agent",
+  "version": "1.0.0",
+  
+  "commands": {
+    "architect_analyze": {
+      "description": "Analyze user specification and start architecture planning",
+      "input": {
+        "type": "object",
+        "properties": {
+          "spec": {
+            "type": "string",
+            "description": "User's project specification",
+            "minLength": 1
+          }
+        },
+        "required": ["spec"]
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "error": { "type": "string", "optional": true }
+        }
+      }
+    },
+    
+    "architect_answer": {
+      "description": "Submit answer to clarifying question",
+      "input": {
+        "type": "object",
+        "properties": {
+          "answer": {
+            "type": "string",
+            "description": "User's answer to current question"
+          }
+        },
+        "required": ["answer"]
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "error": { "type": "string", "optional": true }
+        }
+      }
+    },
+    
+    "architect_get_state": {
+      "description": "Get current agent state",
+      "input": {
+        "type": "object",
+        "properties": {}
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": ["idle", "analyzing", "questioning", "designing", "complete", "error"]
+          },
+          "data": {
+            "type": "object",
+            "description": "State-specific data (questions, plan, error message, etc.)"
+          }
+        }
+      }
+    },
+    
+    "architect_export_plan": {
+      "description": "Export architecture plan to file",
+      "input": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "File path for export"
+          }
+        },
+        "required": ["path"]
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "error": { "type": "string", "optional": true }
+        }
+      }
+    },
+    
+    "architect_cancel": {
+      "description": "Cancel current operation and return to idle",
+      "input": {
+        "type": "object",
+        "properties": {}
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" }
+        }
+      }
+    },
+    
+    "architect_retry": {
+      "description": "Retry from error state with modified spec",
+      "input": {
+        "type": "object",
+        "properties": {
+          "spec": {
+            "type": "string",
+            "description": "Modified specification"
+          }
+        },
+        "required": ["spec"]
+      },
+      "output": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "error": { "type": "string", "optional": true }
+        }
+      }
+    }
+  },
+  
+  "events": {
+    "architect:state-changed": {
+      "description": "Emitted when agent state changes",
+      "payload": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "enum": ["idle", "analyzing", "questioning", "designing", "complete", "error"]
+          },
+          "to": {
+            "type": "string",
+            "enum": ["idle", "analyzing", "questioning", "designing", "complete", "error"]
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["from", "to", "timestamp"]
+      }
+    },
+    
+    "architect:reasoning": {
+      "description": "Emitted for real-time reasoning updates",
+      "payload": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "phase": {
+            "type": "string",
+            "enum": ["analyzing", "questioning", "designing"]
+          },
+          "type": {
+            "type": "string",
+            "enum": ["observation", "analysis", "decision", "question", "conclusion"]
+          },
+          "content": {
+            "type": "string"
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "optional": true
+          }
+        },
+        "required": ["timestamp", "phase", "type", "content"]
+      }
+    },
+    
+    "architect:question": {
+      "description": "Emitted when clarifying question is ready",
+      "payload": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "text": { "type": "string" },
+          "questionType": {
+            "type": "string",
+            "enum": ["single-choice", "multiple-choice", "yes-no", "free-text", "confirmation"]
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "value": { "type": "string" },
+                "label": { "type": "string" },
+                "description": { "type": "string", "optional": true }
+              }
+            },
+            "optional": true
+          },
+          "recommendedAnswer": { "type": "string", "optional": true },
+          "reasoning": { "type": "string", "optional": true },
+          "progress": {
+            "type": "object",
+            "properties": {
+              "current": { "type": "integer" },
+              "total": { "type": "integer" }
+            }
+          }
+        },
+        "required": ["id", "text", "questionType", "progress"]
+      }
+    },
+    
+    "architect:progress": {
+      "description": "Emitted during designing phase for progress updates",
+      "payload": {
+        "type": "object",
+        "properties": {
+          "progress": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Progress as decimal (0.0 to 1.0)"
+          },
+          "task": {
+            "type": "string",
+            "description": "Current task description"
+          },
+          "elapsed": {
+            "type": "number",
+            "description": "Elapsed seconds"
+          }
+        },
+        "required": ["progress", "task", "elapsed"]
+      }
+    },
+    
+    "architect:complete": {
+      "description": "Emitted when architecture plan is complete",
+      "payload": {
+        "type": "object",
+        "properties": {
+          "plan": {
+            "type": "object",
+            "description": "Complete ArchitecturePlan object (see data-model.md)"
+          },
+          "duration": {
+            "type": "number",
+            "description": "Total duration in seconds"
+          },
+          "confidence": {
+            "type": "object",
+            "properties": {
+              "overall": { "type": "number", "minimum": 0, "maximum": 100 },
+              "specClarity": { "type": "number", "minimum": 0, "maximum": 100 },
+              "technicalFeasibility": { "type": "number", "minimum": 0, "maximum": 100 },
+              "architectureSoundness": { "type": "number", "minimum": 0, "maximum": 100 },
+              "completeness": { "type": "number", "minimum": 0, "maximum": 100 },
+              "riskAssessment": { "type": "number", "minimum": 0, "maximum": 100 }
+            },
+            "required": ["overall", "specClarity", "technicalFeasibility", "architectureSoundness", "completeness", "riskAssessment"]
+          }
+        },
+        "required": ["plan", "duration", "confidence"]
+      }
+    },
+    
+    "architect:error": {
+      "description": "Emitted when error occurs",
+      "payload": {
+        "type": "object",
+        "properties": {
+          "message": { "type": "string" },
+          "recoverable": { "type": "boolean" },
+          "suggestions": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Suggested resolution actions"
+          }
+        },
+        "required": ["message", "recoverable"]
+      }
+    }
+  }
+}
