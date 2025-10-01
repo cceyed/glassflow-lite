@@ -96,22 +96,37 @@ export function RevampedPipelineUI() {
 
   // Listen for orchestrator events
   useEffect(() => {
+    console.log('[UI] Setting up orchestrator:reasoning listener');
+    
     const unlisten = listen('orchestrator:reasoning', (event: any) => {
+      console.log('[UI] Received event:', event.payload);
       const { content } = event.payload;
       
       // Determine which agent is speaking
       let agent: Message['agent'] = 'system';
-      if (content.includes('Architect') || content.includes('Phase 1')) agent = 'architect';
-      else if (content.includes('Engineer') || content.includes('Phase 2')) agent = 'engineer';
-      else if (content.includes('Quality') || content.includes('Phase 3')) agent = 'quality';
-      else if (content.includes('Debug') || content.includes('Phase 4')) agent = 'debug';
+      if (content.includes('Architect') || content.includes('Phase 1') || content.includes('Planning')) {
+        agent = 'architect';
+      } else if (content.includes('Engineer') || content.includes('Phase 2') || content.includes('Building')) {
+        agent = 'engineer';
+      } else if (content.includes('Quality') || content.includes('Phase 3') || content.includes('Validating')) {
+        agent = 'quality';
+      } else if (content.includes('Debug') || content.includes('Phase 4') || content.includes('Testing')) {
+        agent = 'debug';
+      }
       
       setCurrentAgent(agentConfig[agent].name);
       
-      addMessage(agent, content);
+      // Add message directly to avoid stale closure
+      setMessages(prev => [...prev, {
+        id: Date.now().toString() + Math.random(),
+        agent,
+        content,
+        timestamp: Date.now()
+      }]);
     });
 
     return () => {
+      console.log('[UI] Cleaning up orchestrator:reasoning listener');
       unlisten.then(fn => fn());
     };
   }, []);
@@ -313,16 +328,26 @@ export function RevampedPipelineUI() {
                 return (
                   <motion.div
                     key={message.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ 
+                      duration: 0.5,
+                      ease: [0.4, 0, 0.2, 1],
+                      delay: Math.min(index * 0.1, 0.3)
+                    }}
                     className="flex gap-4"
                   >
                     {/* Agent Icon */}
                     <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: "spring", stiffness: 200, delay: index * 0.05 }}
+                      initial={{ scale: 0, rotate: -180 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ 
+                        type: "spring", 
+                        stiffness: 200, 
+                        damping: 15,
+                        delay: Math.min(index * 0.1, 0.3) + 0.1
+                      }}
                       className="flex-shrink-0"
                     >
                       <div 
