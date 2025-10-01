@@ -25,7 +25,7 @@ git push origin 003-phase-3-engineer --force
 
 #### 3. New API Key Installed ✅
 - Old exposed key: **REVOKED** (should be revoked on OpenRouter)
-- New key: `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`
+- New key: **[REDACTED - stored securely in .env]**
 - Stored in `.env` (properly gitignored)
 
 #### 4. Verified .gitignore ✅
