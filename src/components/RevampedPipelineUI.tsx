@@ -14,7 +14,6 @@ import {
   Folder,
   FolderOpen,
   ChevronRight,
-  ChevronDown,
   FileJson,
   FileText
 } from 'lucide-react';
@@ -50,6 +49,19 @@ const agentConfig = {
   user: { icon: Send, name: 'You', color: '#FFFFFF' }
 };
 
+const loadingPhrases = [
+  "Warming up the neural networks...",
+  "Consulting the code oracle...",
+  "Summoning the architect spirits...",
+  "Brewing some fresh algorithms...",
+  "Polishing the glass architecture...",
+  "Channeling the flow of creativity...",
+  "Awakening the agent collective...",
+  "Initializing the dream sequence...",
+  "Loading the multiverse of possibilities...",
+  "Gathering cosmic inspiration..."
+];
+
 export function RevampedPipelineUI() {
   const [prompt, setPrompt] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
@@ -58,6 +70,7 @@ export function RevampedPipelineUI() {
   const [generatedFiles, setGeneratedFiles] = useState<GeneratedFile[]>([]);
   const [selectedFile, setSelectedFile] = useState<GeneratedFile | null>(null);
   const [fileTree, setFileTree] = useState<FileTreeNode[]>([]);
+  const [loadingPhrase, setLoadingPhrase] = useState(loadingPhrases[0]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -65,6 +78,21 @@ export function RevampedPipelineUI() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Cycle loading phrases
+  useEffect(() => {
+    if (!isRunning) return;
+    
+    const interval = setInterval(() => {
+      setLoadingPhrase(prev => {
+        const currentIndex = loadingPhrases.indexOf(prev);
+        const nextIndex = (currentIndex + 1) % loadingPhrases.length;
+        return loadingPhrases[nextIndex];
+      });
+    }, 3000); // Change every 3 seconds
+
+    return () => clearInterval(interval);
+  }, [isRunning]);
 
   // Listen for orchestrator events
   useEffect(() => {
@@ -167,8 +195,8 @@ export function RevampedPipelineUI() {
     // Add user message
     addMessage('user', prompt);
     
-    // Add system message
-    addMessage('system', 'Starting multi-agent pipeline...');
+    // Add system message with first loading phrase
+    addMessage('system', loadingPhrases[0]);
     
     try {
       const response: any = await invoke('orchestrator_run_pipeline', {
@@ -372,14 +400,16 @@ export function RevampedPipelineUI() {
             </div>
             
             {isRunning && (
-              <motion.p
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="text-xs text-gray-500 mt-3 flex items-center gap-2"
+                className="mt-3"
               >
-                <Loader2 className="w-3 h-3 animate-spin" />
-                Pipeline running... This may take 30-60 seconds
-              </motion.p>
+                <div className="text-sm font-medium bg-gradient-to-r from-white via-yellow-200 to-white bg-clip-text text-transparent animate-shimmer bg-[length:200%_100%]">
+                  {loadingPhrase}
+                </div>
+                <p className="text-xs text-gray-600 mt-1">This may take 30-60 seconds</p>
+              </motion.div>
             )}
           </div>
 
@@ -393,13 +423,14 @@ export function RevampedPipelineUI() {
             ) : (
               <>
                 {/* File Tree */}
-                <div className="h-1/3 border-b border-gray-900 overflow-hidden flex flex-col">
-                  <div className="px-8 py-4 border-b border-gray-900">
+                <div className="h-1/3 border-b border-gray-900 overflow-hidden flex flex-col bg-gradient-to-b from-black to-gray-950">
+                  <div className="px-8 py-4 border-b border-gray-900 flex items-center justify-between">
                     <h3 className="text-sm font-semibold text-gray-400">
                       Files ({generatedFiles.length})
                     </h3>
+                    <div className="text-xs text-gray-600">Click to view</div>
                   </div>
-                  <div className="flex-1 overflow-y-auto px-4 py-2">
+                  <div className="flex-1 overflow-y-auto px-4 py-4 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-800 hover:scrollbar-thumb-gray-700">
                     <FileTree 
                       nodes={fileTree} 
                       onSelectFile={(file) => setSelectedFile(file)}
@@ -409,29 +440,36 @@ export function RevampedPipelineUI() {
                 </div>
 
                 {/* File Viewer */}
-                <div className="flex-1 overflow-hidden flex flex-col">
+                <div className="flex-1 overflow-hidden flex flex-col bg-black">
                   {selectedFile ? (
                     <>
-                      <div className="px-8 py-4 border-b border-gray-900">
-                        <div className="flex items-center gap-2">
-                          <FileCode className="w-4 h-4 text-yellow-500" />
-                          <span className="text-sm font-mono text-gray-300">
-                            {selectedFile.path}
-                          </span>
-                          <span className="text-xs text-gray-600 ml-auto">
-                            {selectedFile.language}
-                          </span>
+                      <div className="px-8 py-4 border-b border-gray-900 bg-gradient-to-r from-gray-950 to-black">
+                        <div className="flex items-center gap-3">
+                          <FileCode className="w-5 h-5 text-yellow-500" />
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-mono text-gray-300 truncate">
+                              {selectedFile.path}
+                            </div>
+                            <div className="text-xs text-gray-600 mt-0.5">
+                              {selectedFile.language} • {selectedFile.content.split('\n').length} lines
+                            </div>
+                          </div>
                         </div>
                       </div>
-                      <div className="flex-1 overflow-y-auto p-8">
-                        <pre className="text-xs font-mono text-gray-300 leading-relaxed">
+                      <div className="flex-1 overflow-y-auto p-8 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-800 hover:scrollbar-thumb-gray-700">
+                        <motion.pre 
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="text-xs font-mono text-gray-300 leading-relaxed"
+                        >
                           {selectedFile.content}
-                        </pre>
+                        </motion.pre>
                       </div>
                     </>
                   ) : (
-                    <div className="flex items-center justify-center h-full text-gray-600">
-                      <p className="text-sm">Select a file to view</p>
+                    <div className="flex flex-col items-center justify-center h-full text-gray-600">
+                      <FileCode className="w-16 h-16 mb-4 opacity-20" />
+                      <p className="text-sm">Select a file to view its contents</p>
                     </div>
                   )}
                 </div>
@@ -474,7 +512,7 @@ function FileTree({ nodes, onSelectFile, selectedPath, level = 0 }: FileTreeProp
   };
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-0.5">
       {nodes.map((node) => {
         const isExpanded = expandedFolders.has(node.path);
         const isSelected = node.path === selectedPath;
@@ -487,12 +525,14 @@ function FileTree({ nodes, onSelectFile, selectedPath, level = 0 }: FileTreeProp
             <motion.div
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              className={`flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer transition-colors ${
+              whileHover={{ x: 2 }}
+              transition={{ duration: 0.15 }}
+              className={`flex items-center gap-2 px-3 py-2 rounded-md cursor-pointer transition-all ${
                 isSelected 
-                  ? 'bg-yellow-500/20 text-yellow-400' 
-                  : 'hover:bg-gray-800 text-gray-400'
+                  ? 'bg-gradient-to-r from-yellow-500/20 to-yellow-600/10 text-yellow-400 shadow-lg shadow-yellow-500/10' 
+                  : 'hover:bg-gray-800/50 text-gray-400 hover:text-gray-300'
               }`}
-              style={{ paddingLeft: `${level * 12 + 8}px` }}
+              style={{ paddingLeft: `${level * 16 + 12}px` }}
               onClick={() => {
                 if (node.type === 'folder') {
                   toggleFolder(node.path);
@@ -508,24 +548,37 @@ function FileTree({ nodes, onSelectFile, selectedPath, level = 0 }: FileTreeProp
               {node.type === 'folder' && (
                 <motion.div
                   animate={{ rotate: isExpanded ? 90 : 0 }}
-                  transition={{ duration: 0.2 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
                 >
-                  <ChevronRight className="w-3 h-3" />
+                  <ChevronRight className="w-3.5 h-3.5 text-gray-500" />
                 </motion.div>
               )}
-              <Icon className={`w-4 h-4 ${
-                node.type === 'folder' ? 'text-yellow-600' : 'text-yellow-500'
+              <Icon className={`w-4 h-4 flex-shrink-0 ${
+                node.type === 'folder' 
+                  ? 'text-yellow-600' 
+                  : isSelected 
+                    ? 'text-yellow-400' 
+                    : 'text-yellow-500/70'
               }`} />
-              <span className="text-sm font-mono">{node.name}</span>
+              <span className={`text-sm font-mono truncate ${
+                isSelected ? 'font-semibold' : ''
+              }`}>{node.name}</span>
             </motion.div>
 
             {node.type === 'folder' && isExpanded && node.children && (
-              <FileTree
-                nodes={node.children}
-                onSelectFile={onSelectFile}
-                selectedPath={selectedPath}
-                level={level + 1}
-              />
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <FileTree
+                  nodes={node.children}
+                  onSelectFile={onSelectFile}
+                  selectedPath={selectedPath}
+                  level={level + 1}
+                />
+              </motion.div>
             )}
           </div>
         );
